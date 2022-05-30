@@ -3,6 +3,8 @@
 # Environments
 A library that abstracts the execution and persistence model of data structures pertaining to computational mechanics problems
 
+[![Build Status](https://dev.azure.com/mgroupntua/MSolve/_apis/build/status/mgroupntua.Environments?branchName=develop)](https://dev.azure.com/mgroupntua/MSolve/_build/latest?definitionId=18&branchName=develop)
+
 ## Installation instructions
 You can choose either to clone the solution or downloads it as a zip file.
 
