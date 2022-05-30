@@ -34,6 +34,7 @@ steps:
     pwsh: true
 
 - task: SonarCloudPrepare@1
+  enabled: false
   displayName: "Prepare SonarCloud analysis"
   inputs:
     SonarCloud: 'SonarCloud'
@@ -79,9 +80,11 @@ steps:
     publishTestResults: true
 
 - task: SonarCloudAnalyze@1
+  enabled: false
   displayName: "Perform SonarCloud analysis"
 
 - task: SonarCloudPublish@1
+  enabled: false
   displayName: 'Publish Quality Gate results'
   inputs:
     pollingTimeoutSec: '300'
