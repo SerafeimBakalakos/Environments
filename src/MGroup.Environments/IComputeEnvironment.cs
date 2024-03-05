@@ -17,9 +17,13 @@ namespace MGroup.Environments
 	/// </summary>
 	public interface IComputeEnvironment
 	{
+		Dictionary<int, T> AllGather<T>(Func<int, T> getDataPerNode);
+
 		bool AllReduceAnd(Dictionary<int, bool> valuePerNode);
 
 		bool AllReduceOr(IDictionary<int, bool> valuePerNode);
+
+		int AllReduceSum(Func<int, int> calcNodeData);
 
 		double AllReduceSum(Dictionary<int, double> valuePerNode);
 
@@ -50,7 +54,7 @@ namespace MGroup.Environments
 		/// Same as <see cref="CalcNodeDataAndTransferToGlobalMemory{T}(Func{int, T})"/>, but only for nodes that satisfy 
 		/// <paramref name="isActiveNode"/>.
 		/// </summary>
-		Dictionary<int, T> CalcNodeDataAndTransferToGlobalMemoryPartial<T>(Func<int, T> calcNodeData, 
+		Dictionary<int, T> CalcNodeDataAndTransferToGlobalMemoryPartial<T>(Func<int, T> calcNodeData,
 			Func<int, bool> isActiveNode);
 
 		/// <summary>
@@ -87,7 +91,6 @@ namespace MGroup.Environments
 
 		void DoPerNodeSerially(Action<int> actionPerNode);
 
-
 		//TODOMPI: Its most common use is weird: An Action<int> is called by the environment. The environment passes the id of 
 		//      each ComputeNode it manages. Then the Action<int> requests from the environment to provide the ComputeNode for
 		//      the same id that the environment provided, e.g. to inspect the neighboring ComputeNode ids.
@@ -101,7 +104,7 @@ namespace MGroup.Environments
 		/// Initializes the environment (e.g. works out communication paths). This must be always called exactly once, and 
 		/// before any other member.
 		/// </summary>
-		void Initialize(ComputeNodeTopology nodeTopology); 
+		void Initialize(ComputeNodeTopology nodeTopology);
 
 		//TODOMPI: Overload that uses delegates for assembling the send data and processing the receive data per neighbor of 
 		//      each compute node. This will result in better pipelining, which I think will greatly improve performance and 

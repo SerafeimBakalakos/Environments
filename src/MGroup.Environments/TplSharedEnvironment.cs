@@ -21,6 +21,8 @@ namespace MGroup.Environments
 			this.optimizeBuffers = optimizeBuffers;
 		}
 
+		public Dictionary<int, T> AllGather<T>(Func<int, T> getDataPerNode) => CalcNodeData(getDataPerNode);
+
 		public bool AllReduceAnd(Dictionary<int, bool> valuePerNode)
 		{
 			//TODOMPI: Reductions can be done more efficiently by having each thread reduce the values assigned to it. Then either
@@ -43,6 +45,16 @@ namespace MGroup.Environments
 				}
 			}
 			return false;
+		}
+
+		public int AllReduceSum(Func<int, int> calcNodeData)
+		{
+			int sum = 0;
+			foreach (int nodeID in nodeTopology.Nodes.Keys)
+			{
+				sum += calcNodeData(nodeID);
+			}
+			return sum;
 		}
 
 		public double AllReduceSum(Dictionary<int, double> valuePerNode)
@@ -75,9 +87,9 @@ namespace MGroup.Environments
 		{
 			// Add the keys first to avoid race conditions
 			var result = new Dictionary<int, T>(nodeTopology.Nodes.Count);
-			foreach (int nodeID in nodeTopology.Nodes.Keys) 
+			foreach (int nodeID in nodeTopology.Nodes.Keys)
 			{
-				result[nodeID] = default; 
+				result[nodeID] = default;
 			}
 
 			// Run the operation per node in parallel and store the individual results.
@@ -107,6 +119,7 @@ namespace MGroup.Environments
 			}
 			return result;
 		}
+
 		public Dictionary<int, T> CalcNodeDataAndTransferToLocalMemory<T>(Func<int, T> calcNodeData)
 			=> CalcNodeData(calcNodeData);
 
