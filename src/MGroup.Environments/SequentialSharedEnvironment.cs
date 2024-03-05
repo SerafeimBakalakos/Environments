@@ -19,6 +19,8 @@ namespace MGroup.Environments
 			this.optimizeBuffers = optimizeBuffers;
 		}
 
+		public Dictionary<int, T> AllGather<T>(Func<int, T> getDataPerNode) => CalcNodeData(getDataPerNode);
+
 		public bool AllReduceAnd(Dictionary<int, bool> valuePerNode)
 		{
 			bool result = true;
@@ -39,6 +41,16 @@ namespace MGroup.Environments
 				}
 			}
 			return false;
+		}
+
+		public int AllReduceSum(Func<int, int> calcNodeData)
+		{
+			int sum = 0;
+			foreach (int nodeID in nodeTopology.Nodes.Keys)
+			{
+				sum += calcNodeData(nodeID);
+			}
+			return sum;
 		}
 
 		public double AllReduceSum(Dictionary<int, double> valuePerNode)
@@ -78,7 +90,7 @@ namespace MGroup.Environments
 		public Dictionary<int, T> CalcNodeDataAndTransferToGlobalMemory<T>(Func<int, T> calcNodeData)
 			=> CalcNodeData(calcNodeData);
 
-		public Dictionary<int, T> CalcNodeDataAndTransferToGlobalMemoryPartial<T>(Func<int, T> calcNodeData, 
+		public Dictionary<int, T> CalcNodeDataAndTransferToGlobalMemoryPartial<T>(Func<int, T> calcNodeData,
 			Func<int, bool> isActiveNode)
 		{
 			var result = new Dictionary<int, T>(nodeTopology.Nodes.Count);
@@ -223,7 +235,7 @@ namespace MGroup.Environments
 
 						if (!areRecvBuffersKnown)
 						{
-							
+
 							Debug.Assert(!thisData.recvValues.ContainsKey(otherNodeID), "This buffer must not exist previously.");
 						}
 						else
